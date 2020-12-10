@@ -11,6 +11,7 @@
           <!-- <router-link to="/about" class="nav-link">About</router-link> -->
           <router-link to="/" class="nav-link">Dashboard</router-link>
           <router-link to="/tables" class="nav-link">Tables</router-link>
+          <router-link to="/csv" class="nav-link">CSV</router-link>
         </div>
       </div>
     </nav>

@@ -6,7 +6,7 @@ Vue.use(VueRouter)
 
 const routes = [{
     path: '/',
-    redirect : '/dashboard',
+    redirect: '/dashboard',
     name: 'Dashboard',
     component: Dashboard
   },
@@ -14,6 +14,11 @@ const routes = [{
     path: '/tables',
     name: 'Tables',
     component: () => import( /* webpackChunkName: "about" */ '../views/Tables.vue')
+  },
+  {
+    path: '/csv',
+    name: 'csv',
+    component: () => import( /* webpackChunkName: "about" */ '../views/CSV.vue')
   }
 ]
 

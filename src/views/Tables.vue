@@ -12,11 +12,23 @@
                 <thead>
                     <tr>
                     <th scope="col" v-for="col in table_cols" v-bind:key="col.column_name">{{col.column_ui_name}}</th>
+                    <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="row in table_content" :key="row.ID">
+                    <tr v-for="(row, index) in table_content" :key="row.ID">
                         <td v-for="col in table_cols" :key="col.column_name">{{row[col.column_name]}}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-outline-secondary icon-btn" type="button" @click="deleteRow(index)">
+                                    <i class="mdi mdi-delete"></i>delete</button>
+                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="editMode" @click="editRow(index)">
+                                    <i class="mdi mdi-account-edit"></i>edit</button>
+                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="!editMode" @click="updateRow(index)">
+                                    <i class="mdi mdi-sticker-check-outline"></i>update
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -36,7 +48,8 @@
                 selected_table : null,
                 table_data : null,
                 table_cols : null,
-                table_content : null
+                table_content : null,
+                editMode: true
             };
             },
         created: function() {
@@ -52,6 +65,7 @@
                     .then(res => {
                         this.table_cols = res[0].data
                         this.table_content = res[1].data
+                        // debugger
                     });
                 })
         },
@@ -65,6 +79,10 @@
                         this.table_cols = res[0].data
                         this.table_content = res[1].data
                     });
+            },
+            editRow(i){
+                this.editMode = false
+                console.log(i)
             }
         }
     }
