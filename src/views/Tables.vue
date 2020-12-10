@@ -22,9 +22,9 @@
                             <div class="btn-group" role="group">
                                 <button class="btn btn-outline-secondary icon-btn" type="button" @click="deleteRow(index)">
                                     <i class="mdi mdi-delete"></i>delete</button>
-                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="editMode" @click="editRow(index)">
+                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="editMode" @click="editRow(row,index)">
                                     <i class="mdi mdi-account-edit"></i>edit</button>
-                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="!editMode" @click="updateRow(index)">
+                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="!editMode" @click="updateRow(row, index)">
                                     <i class="mdi mdi-sticker-check-outline"></i>update
                                 </button>
                             </div>
@@ -80,9 +80,9 @@
                         this.table_content = res[1].data
                     });
             },
-            editRow(i){
+            editRow(row,i){
                 this.editMode = false
-                console.log(i)
+                console.log(i, row)
             }
         }
     }
