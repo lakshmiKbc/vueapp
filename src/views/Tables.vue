@@ -16,23 +16,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(row, index) in table_content" :key="row.ID">
-                        <td v-for="col in table_cols" :key="col.column_name">{{row[col.column_name]}}</td>
+                    <tr v-for="(row, index) in table_content" :key="index">
+                        <td v-for="col in table_cols" :key="col.column_name">
+                            <span v-if="!row.editMode">{{row[col.column_name]}}</span>
+                            <input :placeholder="col.column_ui_name" v-if="row.editMode">
+                        </td>
+                        
                         <td>
                             <div class="btn-group" role="group">
                                 <button class="btn btn-outline-secondary icon-btn" type="button" @click="deleteRow(index)">
-                                    <i class="mdi mdi-delete"></i>delete</button>
-                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="editMode" @click="editRow(row,index)">
-                                    <i class="mdi mdi-account-edit"></i>edit</button>
-                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="!editMode" @click="updateRow(row, index)">
-                                    <i class="mdi mdi-sticker-check-outline"></i>update
-                                </button>
+                                    delete</button>
+                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="!row.editMode" @click="editRow(row,index)">
+                                    edit</button>
+                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="row.editMode" @click="updateRow(row, index)">
+                                    update</button>
                             </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+        <button class="btn btn-light" @click="addRow(table_cols)">Add</button>
         </div>
     </div>
     
@@ -42,20 +46,21 @@
     
     export default {
         name: 'data_table',
+        props: [],
         data() {
             return {
                 table_list: null,
                 selected_table : null,
                 table_data : null,
                 table_cols : null,
-                table_content : null,
-                editMode: true
-            };
+                table_content : null
+            }
             },
         created: function() {
             axios
                 .get('http://148.72.64.224:82/table_list')
                 .then(res => {
+                    // console.log(res)
                     this.table_list = res.data;
                     this.selected_table = res.data[0].table_name
                     axios.all([
@@ -65,7 +70,9 @@
                     .then(res => {
                         this.table_cols = res[0].data
                         this.table_content = res[1].data
-                        // debugger
+                        this.table_content.forEach(d => {
+                            this.$set(d, 'editMode', false)
+                        });
                     });
                 })
         },
@@ -81,8 +88,21 @@
                     });
             },
             editRow(row,i){
-                this.editMode = false
-                console.log(i, row)
+                this.$set(row, 'editMode', true)
+                console.log(i);
+                
+            },
+            updateRow(row,i){
+                this.$set(row, 'editMode', false)
+                console.log(i);
+                
+            },
+            addRow(cols){
+                // let newRow = {}
+                // this.table_cols.forEach(col => {
+                //     newRow[col] = ''
+                // });
+                // console.log(cols,newRow)
             }
         }
     }
