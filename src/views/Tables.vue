@@ -18,17 +18,16 @@
                 <tbody>
                     <tr v-for="(row, index) in table_content" :key="index">
                         <td v-for="col in table_cols" :key="col.column_name">
-                            <span v-if="!row.editMode">{{row[col.column_name]}}</span>
-                            <input :placeholder="col.column_ui_name" v-if="row.editMode">
+                            <input :placeholder="col.column_ui_name" v-model="row[col.column_name]" class="text-center" :disabled="!row.editMode">
                         </td>
                         
                         <td>
                             <div class="btn-group" role="group">
                                 <button class="btn btn-outline-secondary icon-btn" type="button" @click="deleteRow(index)">
                                     delete</button>
-                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="!row.editMode" @click="editRow(row,index)">
+                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="!row.editMode" @click="editRow(row)">
                                     edit</button>
-                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="row.editMode" @click="updateRow(row, index)">
+                                <button class="btn btn-outline-secondary icon-btn" type="button" v-if="row.editMode" @click="updateRow(row)">
                                     update</button>
                             </div>
                         </td>
@@ -43,6 +42,12 @@
 </template>
 <script lang="ts">
     import axios from 'axios'
+    import Vue from 'vue';
+    import 'vue-toast-notification/dist/theme-sugar.css';
+    import VueToast from 'vue-toast-notification';
+
+    Vue.use(VueToast);
+
     
     export default {
         name: 'data_table',
@@ -77,6 +82,15 @@
                 })
         },
         methods : {
+             notify(msg, type) {
+                this.$toast.open({
+                    message: msg,
+                    type: type,
+                    duration: 5000,
+                    dismissible: true, 
+                    position: 'top'
+                })
+            },
             ontableChange(event){
                 axios.all([
                         axios.get('http://148.72.64.224:82/table_cols/' + event.target.value),
@@ -87,22 +101,36 @@
                         this.table_content = res[1].data
                     });
             },
-            editRow(row,i){
+            editRow(row){
+                
                 this.$set(row, 'editMode', true)
-                console.log(i);
                 
             },
-            updateRow(row,i){
+            updateRow(row){
                 this.$set(row, 'editMode', false)
-                console.log(i);
-                
+                console.log(row)
+                delete row['editMode']
+                axios.put('http://148.72.64.224:82/table_content/' + this.selected_table, row).then(res => {
+                    if(res.status == 200){
+                        this.notify('Updated Successfully', 'success')
+                    }
+                    if(res.status != 200){
+                        this.notify('Sometthing went wrong!!', 'danger')
+                    }
+                    
+                })
             },
             addRow(cols){
-                // let newRow = {}
-                // this.table_cols.forEach(col => {
-                //     newRow[col] = ''
-                // });
-                // console.log(cols,newRow)
+                let t = {}
+                cols.forEach(col => {
+                    t[col] = ''
+                });
+                this.$set(t, 'editMode', true)
+                this.table_content.push(t)
+
+            },
+            deleteRow(i){
+                this.table_content.splice(i, 1)
             }
         }
     }
